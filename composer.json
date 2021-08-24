@@ -9,7 +9,8 @@
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.54",
-        "laravel/tinker": "^2.5"
+        "laravel/tinker": "^2.5",
+        "laravel/ui": "^3.3"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
@@ -36,6 +37,7 @@
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
         ],
+        "test":"vendor/bin/phpunit",
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi"
         ],
