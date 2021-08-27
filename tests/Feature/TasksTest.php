@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class TasksTest extends TestCase
@@ -38,4 +39,28 @@ class TasksTest extends TestCase
         $response->assertSee($task->title)
             ->assertSee($task->description);
     }
+    /** @test */
+public function a_task_requires_a_title(){
+
+    // $this->actingAs(factory('App\Models\User')->create());
+    $test=\App\Models\User::factory()->create();
+    $this->actingAs($test);
+
+    $task = \App\Models\Task::factory()->make(['title' => null]);
+
+    $this->post('/tasks',$task->toArray())
+            ->assertSessionHasErrors('title');
+}
+
+/** @test */
+public function a_task_requires_a_description(){
+
+    $test=\App\Models\User::factory()->create();
+    $this->actingAs($test);
+
+    $task = \App\Models\Task::factory()->make(['description' => null]);
+
+    $this->post('/tasks',$task->toArray())
+        ->assertSessionHasErrors('description');
+}
 }
