@@ -63,4 +63,28 @@ public function a_task_requires_a_description(){
     $this->post('/tasks',$task->toArray())
         ->assertSessionHasErrors('description');
 }
+/** @test */
+public function authenticated_users_can_create_a_new_task()
+{
+    //Given we have an authenticated user
+    $test=\App\Models\User::factory()->create();
+    $this->actingAs($test);
+    //And a task object
+    $task = \App\Models\Task::factory()->make();
+    //When user submits post request to create task endpoint
+    $this->post('/tasks',$task->toArray());
+    //It gets stored in the database
+    $this->assertEquals(1,\App\Models\Task::all()->count());
+}
+/** @test */
+public function unauthenticated_users_cannot_create_a_new_task()
+{
+    //Given we have a task object
+    $task = \App\Models\Task::factory()->make();
+
+    //When unauthenticated user submits post request to create task endpoint
+    // He should be redirected to login page
+    $this->post('/tasks',$task->toArray())
+         ->assertRedirect(url('/'));
+}
 }
