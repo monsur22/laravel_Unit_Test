@@ -6,10 +6,12 @@ use Tests\TestCase;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-
+use Illuminate\Foundation\Testing\WithFaker;
 class TasksTest extends TestCase
 {
-    use DatabaseMigrations;
+    use DatabaseMigrations, WithFaker;
+
+
 
     /** @test */
     public function a_user_can_read_all_the_tasks()
@@ -144,8 +146,60 @@ public function authorized_user_can_delete_the_task(){
 public function unauthorized_user_cannot_delete_the_task(){
     $task = \App\Models\Task::factory()->create();
     $this->delete('/tasks/'.$task->id)
-    ->assertRedirect(url('/'));
+    ->assertRedirect(url('/login'));
 
 }
+/** @test */
+public function a_user_can_register()
+{
 
+    $response = $this->post('register', [
+        'name' => 'JMac',
+        'email' => 'jmac@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ]);
+
+    $response->assertRedirect(route('home'));
+    // dd($response->email);
+    // $user = \App\Models\User::where('email', $response->email)->where('name', $response->name)->first();
+    // $this->assertNotNull($user);
+
+    // $this->assertAuthenticatedAs($user);
+}
+/** @test */
+
+public function register_creates_and_authenticates_a_user()
+{
+    $name = $this->faker->name;
+    $email = $this->faker->safeEmail;
+    $password = $this->faker->password(8);
+
+    $response = $this->post('register', [
+        'name' => $name,
+        'email' => $email,
+        'password' => $password,
+        'password_confirmation' => $password,
+    ]);
+
+    $response->assertRedirect(route('home'));
+
+    $user = User::where('email', $email)->where('name', $name)->first();
+    $this->assertNotNull($user);
+
+    $this->assertAuthenticatedAs($user);
+}
+    /** @test */
+    public function login_authenticates_and_redirects_user()
+    {
+        $user = \App\Models\User::factory()->create();
+
+        $response = $this->post(route('login'), [
+            'email' => $user->email,
+            'password' => 'password'
+        ]);
+
+        $response->assertRedirect(route('home'));
+        $this->assertAuthenticatedAs($user);
+    }
 }
