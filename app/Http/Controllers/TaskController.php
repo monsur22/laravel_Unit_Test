@@ -12,6 +12,9 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct(){
+        $this->middleware('auth')->except(['index','show']);
+    }
     public function index()
     {
         $tasks = Task::latest()->get();
@@ -84,7 +87,12 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        //
+        // $task->update($request->all());
+        // return redirect('/tasks/'.$task->id);
+        // $this->authorize('update', $task);
+
+        $task->update($request->all());
+        return redirect('/tasks/'.$task->id);
     }
 
     /**
@@ -95,6 +103,11 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        // $this->authorize('update', $task);
+
+        $task->delete();
+
+        return redirect("/tasks");
     }
+    
 }

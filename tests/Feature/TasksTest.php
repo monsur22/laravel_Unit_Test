@@ -85,6 +85,67 @@ public function unauthenticated_users_cannot_create_a_new_task()
     //When unauthenticated user submits post request to create task endpoint
     // He should be redirected to login page
     $this->post('/tasks',$task->toArray())
-         ->assertRedirect(url('/'));
+        ->assertRedirect('/login');
 }
+/** @test */
+public function authorized_user_can_update_the_task(){
+
+    //Given we have a signed in user
+    // $this->actingAs(factory('App\User')->create());
+    $test=\App\Models\User::factory()->create();
+    $this->actingAs($test);
+    //And a task which is created by the user
+    $task = \App\Models\Task::factory()->create();
+    // $task = \App\Models\Task::factory()->create(['user_id' => Auth::id()]);
+    $task->title = "Updated Title";
+    //When the user hit's the endpoint to update the task
+    $this->put('/tasks/'.$task->id, $task->toArray());
+    //The task should be updated in the database.
+    $this->assertDatabaseHas('tasks',['id'=> $task->id , 'title' => 'Updated Title']);
+
+}
+/** @test */
+public function unauthorized_user_cannot_update_the_task(){
+    //Given we have a signed in user
+    // $test=\App\Models\User::factory()->create();
+    // $this->actingAs($test);
+    // //And a task which is not created by the user
+    // $task = \App\Models\Task::factory()->create();
+    // $task->title = "Updated Title";
+    $task = \App\Models\Task::factory()->create();
+    $task->title = "Updated Title";
+
+
+    //When the user hit's the endpoint to update the task
+    $this->put('/tasks/'.$task->id, $task->toArray())
+        ->assertRedirect(url('/login'));
+
+    //We should expect a 403 error
+    // $response->assertStatus(403);
+
+}
+/** @test */
+public function authorized_user_can_delete_the_task(){
+
+    //Given we have a signed in user
+    $test = \App\Models\User::factory()->create();
+    $this->actingAs($test);
+    //And a task which is created by the user
+    $task = \App\Models\Task::factory()->create();
+    //When the user hit's the endpoint to delete the task
+    $this->delete('/tasks/'.$task->id)
+    ->assertRedirect(url('/tasks'));
+    // //The task should be deleted from the database.
+    // $this->assertDatabaseMissing('tasks',['id'=> $task->id]);
+
+
+}
+/** @test */
+public function unauthorized_user_cannot_delete_the_task(){
+    $task = \App\Models\Task::factory()->create();
+    $this->delete('/tasks/'.$task->id)
+    ->assertRedirect(url('/'));
+
+}
+
 }

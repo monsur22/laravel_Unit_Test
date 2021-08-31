@@ -24,3 +24,5 @@ Route::get('/tasks', [App\Http\Controllers\TaskController::class, 'index']);
 Route::get('/tasks/{task}', [App\Http\Controllers\TaskController::class, 'show']);
 Route::get('/tasks/create', [App\Http\Controllers\TaskController::class, 'create']);
 Route::post('/tasks', [App\Http\Controllers\TaskController::class, 'store']);
+Route::put('/tasks/{task}', [App\Http\Controllers\TaskController::class, 'update']);
+Route::delete('/tasks/{task}', [App\Http\Controllers\TaskController::class, 'destroy']);
